@@ -1,6 +1,6 @@
 def setup():
     '''Puts todo.py in bin, Makes the directory, database, and config file for todo'''
-    import os,stat,shutil,sqlite3,todo
+    import os,stat,shutil,sqlite3
     relative_path = '/.todo/'
     base_path = os.getenv('HOME')
     path = base_path + relative_path
@@ -51,13 +51,10 @@ def setup():
     # Make the database:
     if not os.path.exists(dbpath):
         print 'Initialized database at',dbpath
-        c,connected = todo.dbConnect(dbpath)
-        if connected:
-            c.execute('''create table todo (hash text, descrip text, ts datetime)''')
-            c.close()
-        else:
-            print 'Fatal: Could not create database'
-            return False
+        connection = sqlite3.connect(dbpath)
+        c = connection.cursor()
+        c.execute('''create table todo (hash text, descrip text, ts datetime)''')
+        c.close()
     else:
         print 'Fatal: Database already exists:',path + 'todo.db'
         print '''To remove todo, run:
@@ -67,13 +64,32 @@ def setup():
     if not os.path.exists(cpath):
         try:
             shutil.copy('todo.config',cpath)
-            print 'Copying std. config to',cpath
+            print 'Copied std. config to',cpath
         except IOError:
             print 'Fatal: Permission Denied'
             print '''Try running:
                         sudo python setup.py'''
             return False
+    # Move the support modules:
+    try:
+        shutil.copytree('todolib',path + 'todolib')
+        print 'Moved support modules to',path
+    except IOError:
+        print 'Fatal: Permission Denied'
+        print '''Try running:
+                    sudo python setup.py'''
+    # Change the permissions of .todo and todo.db:
+    #
+    # Why? When sudo is used to run this, root owns the directory which causes problems connecting to the db.
+    try:
+        os.chmod(path,0777)
+        os.chmod(dbpath,0777)
+        print 'Modifying directory and database permissions'
+    except OSError:
+        print 'Fatal: Could not set database permissions. todo needs write access to the database.'
+        return False
     return True
+
 
 if __name__ == '__main__':
     result = setup()

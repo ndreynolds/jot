@@ -1,0 +1,6 @@
+# don't need script for reinstalling.
+ri.sh
+# don't need dev notes.
+todo.notes
+# don't need the executable.
+todo
