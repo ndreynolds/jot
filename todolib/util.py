@@ -1,15 +1,27 @@
 import os,glob
 
+def decorate(colorCode,text):
+    '''Returns a string enveloped by an ANSI color code'''
+    colors = {'HEADER' : '\033[95m',
+              'OKBLUE' : '\033[94m',
+              'OKGREEN' : '\033[92m',
+              'WARNING' : '\033[93m',
+              'FAIL' : '\033[91m',
+              'ENDC' : '\033[0m'}
+    return colors[colorCode] + text + colors['ENDC']
+
 def parseArgs(args):
     '''Parse arguments that follow the command'''
     prevArg = None 
     parsedArgs = []
     for arg in args:
-        if arg[0] == '-':
+        # pairs arguments in to tuples
+        if arg[0] == '-': 
+            # the first char of the first element of the tuple must be a '-'
             if prevArg is not None:
                 tup = prevArg,None
                 parsedArgs.append(tup)
-            prevArg = [ch for ch in arg[1:]]
+            prevArg = arg[1:]
         elif prevArg is not None:
             tup = prevArg,arg
             parsedArgs.append(tup)

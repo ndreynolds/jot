@@ -21,8 +21,12 @@ def show(db,args):
             items = [db.grabItem(sub)]
     else:
         items = db.grabMostRecent(5)
+    if items is None:
+        print 'No items to display'
+        return False
     if len(items) > 0:
         for item in items:
             item.display()
         return True
+    print 'No items to display'
     return False

@@ -5,7 +5,7 @@ class Connection:
     '''Creates a sqlite3 database connection and offers methods for selecting, deleting,
        and updating items. All actions are written to the changelog.'''
 
-    def __init__(self,path='~/.todo/todo.db',changelog='~/.todo/todo.changelog',verbose=True):
+    def __init__(self,path='~/.todo/todo.db',changelog='~/.todo/todo.changelog',verbose=False):
         '''Constructs a Connection object with option to set locations and verbosity'''
         self.path = util.matchPath(path)
         self.cursor = None
@@ -22,7 +22,8 @@ class Connection:
     def insertItem(self,item):
         '''Inserts an item.'''
 
-        query = 'insert into todo(hash,descrip,ts) values("%s","%s","%s")' % (item.identifier, item.content, item.timestamp)
+        query = 'insert into todo(hash,descrip,priority,ts) values("%s","%s","%s","%s")' \
+            % (item.identifier, item.content, item.priority, item.timestamp)
         if self.connected:
             self.cursor.execute(query)
             self.commit()
@@ -49,12 +50,15 @@ class Connection:
     def grabItem(self, identifier):
         '''Given an identifier hash, returns an Item object.'''
 
+        identifier = self.matchIdentifier(identifier)
+        if identifier is None:
+            return None
         query = 'select * from todo where hash="%s"' % (identifier)
         if self.connected:
             self.cursor.execute(query)
             row = self.cursor.fetchone()
             if row is not None:
-                item = Item(db=self,identifier=row[0],content=row[1],timestamp=row[2])
+                item = Item(db=self,identifier=row[0],content=row[1],priority=row[2],timestamp=row[3])
                 return item
             else:
                 return None
@@ -69,7 +73,7 @@ class Connection:
             items = []
             if len(rows) > 0:
                 for row in rows:
-                    item = Item(db=self,identifier=row[0],content=row[1],timestamp=row[2])
+                    item = Item(db=self,identifier=row[0],content=row[1],priority=row[2],timestamp=row[3])
                     items.append(item)
                 return items
             else:
@@ -85,11 +89,27 @@ class Connection:
             items = []
             if len(rows) > 0:
                 for row in rows:
-                    item = Item(db=self,identifier=row[0],content=row[1],timestamp=row[2])
+                    item = Item(db=self,identifier=row[0],content=row[1],priority=row[2],timestamp=row[3])
                     items.append(item)
                 return items
             else:
                 return None
+
+    def matchIdentifier(self,identifier):
+        '''Since entering partial identifier hashes is allowed, we need a way to match them'''
+
+        query = 'select hash from todo where hash like "%s%%"' % identifier 
+        if self.connected:
+            self.cursor.execute(query)
+            rows = self.cursor.fetchall()
+            if len(rows) == 0:
+                print util.decorate('FAIL','Fatal: No identifier could be matched')
+                return None 
+            if len(rows) > 1:
+                print util.decorate('FAIL','Fatal: Supplied identifier has multiple matches, please be more specific.')
+                return None 
+            else:
+                return str(rows[0][0])
 
     def commit(self):
         '''Commit the change(s) to the database.'''

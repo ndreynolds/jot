@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import sys, glob, os, sqlite3, time, hashlib, tempfile, imp
+import sys, glob, os
     
 # Overview:
 #   The program is run by typing todo in to the shell followed
@@ -39,6 +39,9 @@ def main():
     # Parse the configuration file
     config = { 'peers' : {} }
     config = util.parseConfig(config)
+
+    # Apply changelog
+
 
     # Parse the command/arguments
     args = []

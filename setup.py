@@ -53,7 +53,7 @@ def setup():
         print 'Initialized database at',dbpath
         connection = sqlite3.connect(dbpath)
         c = connection.cursor()
-        c.execute('''create table todo (hash text, descrip text, ts datetime)''')
+        c.execute('''create table todo (hash text, descrip text, priority text, ts datetime)''')
         c.close()
     else:
         print 'Fatal: Database already exists:',path + 'todo.db'

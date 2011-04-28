@@ -1,4 +1,5 @@
-import time, hashlib, os, tempfile
+import hashlib, os, tempfile, time, util
+from datetime import datetime
 
 class Item:
     '''Creates a todo item with an identifier and various methods.'''
@@ -11,7 +12,7 @@ class Item:
         # appropriate parameters.
 
         if timestamp is None:
-            self.timestamp = time.time()
+            self.timestamp = datetime.now().strftime('%a %b %d %H:%M')
         else:
             self.timestamp = timestamp
         if identifier is None:
@@ -46,7 +47,6 @@ class Item:
             fp = open(path,'r')
             self.content = ''.join([line for line in fp])
             fp.close()
-            print 'Content saved'
             return True
         else:
             print 'Aborting'
@@ -63,7 +63,15 @@ class Item:
 
     def display(self):
         '''Prints the item's attributes.'''
-        print self.identifier
-        print self.timestamp
-        print self.priority
-        print self.content
+        content = ''
+        for ch in self.content:
+            if ch == '\n':
+                content += '\n          '
+            else:
+                content += ch
+        print 'Hash:    ', util.decorate('WARNING',self.identifier)
+        print 'Time:    ', util.decorate('WARNING',self.timestamp)
+        print 'Priority:', util.decorate('WARNING',self.priority)
+        print 'Content: ', content
+        print
+
