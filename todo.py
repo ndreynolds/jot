@@ -36,14 +36,14 @@ def main():
     # Class modules
     from todolib import item, connection, util
     # Command modules
-    from todolib import add, version, remove, show, peer, config, search, edit
+    from todolib import add, version, remove, show, peer, config, search, edit, pull, push
 
     # Parse the configuration file
     config = { 'peers' : {} }
     config = util.parseConfig(config)
 
     # Apply changelog
-
+    util.processChangelog()
 
     # Parse the command/arguments
     args = []
@@ -77,6 +77,10 @@ def main():
         search.search(db,args)
     if command == 'edit':
         edit.edit(db,args)
+    if command == 'pull':
+        pull.pull(args)
+    if command == 'push':
+        push.push(args)
     return True
 
 def matchPath(path):

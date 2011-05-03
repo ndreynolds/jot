@@ -1,4 +1,25 @@
-import os,glob
+import os,glob,time
+
+def processChangelog(basepath='~/.todo/todo.changelog'):
+    '''Look for foreign changelogs and update and delete them'''
+    from connection import Connection
+    path = matchPath(basepath,mustExist=False) + '.*'
+    logs = glob.glob(path)
+    if len(logs) > 0:
+        print 'Found new changelog. Updating local database...',
+        trans = Connection(table='transactions',verbose=True)
+        db = Connection()
+        for log in logs:
+            logfile = open(log,'r')
+            for line in logfile:
+                line = line.strip()
+                identifier = line[0:33]
+                query = line[33:]
+                if trans.matchIdentifier(identifier,quiet=True) is None:
+                    trans.rawQuery('insert into trans("%s","%s")' % (identifier,time.time()))
+                    trans.rawQuery(query)
+            logfile.close()
+    return True
 
 def decorate(colorCode,text):
     '''Returns a string enveloped by an ANSI color code'''

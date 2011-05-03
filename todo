@@ -43,7 +43,7 @@ def main():
     config = util.parseConfig(config)
 
     # Apply changelog
-
+    util.processChangelog()
 
     # Parse the command/arguments
     args = []

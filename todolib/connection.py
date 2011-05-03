@@ -1,16 +1,17 @@
-import util, sqlite3
+import util, sqlite3, hashlib, time
 from item import Item
 
 class Connection:
     '''Creates a sqlite3 database connection and offers methods for selecting, deleting,
        and updating items. All actions are written to the changelog.'''
 
-    def __init__(self,path='~/.todo/todo.db',changelog='~/.todo/todo.changelog',verbose=False):
+    def __init__(self,path='~/.todo/todo.db',changelog='~/.todo/todo.changelog',table='todo',verbose=False):
         '''Constructs a Connection object with option to set locations and verbosity'''
         self.path = util.matchPath(path)
         self.cursor = None
         self.connected = False
         self.verbose = verbose
+        self.table = table
         self.changelog = util.matchPath(changelog,mustExist=False)
         try:
             self.connection = sqlite3.connect(self.path)
@@ -19,11 +20,18 @@ class Connection:
         except sqlite3.Error:
             print 'Fatal: Could not connect to database.'
 
+    def rawQuery(self,query):
+        '''Executes a raw SQL query.'''
+        if self.connected:
+            if self.verbose:
+                print query
+            self.cursor.execute(query)
+            self.commit()
+
     def insertItem(self,item):
         '''Inserts an item.'''
-
-        query = 'insert into todo(hash,content,priority,ts) values("%s","%s","%s","%s")' \
-            % (item.identifier, item.content, item.priority, item.timestamp)
+        query = 'insert into %s(hash,content,priority,ts) values("%s","%s","%s","%s")' \
+            % (self.table,item.identifier, item.content, item.priority, item.timestamp)
         if self.connected:
             self.cursor.execute(query)
             self.commit()
@@ -31,8 +39,7 @@ class Connection:
 
     def deleteItem(self,item):
         '''Deletes an item.'''
-
-        query = 'delete from todo where hash="%s"' % (item.identifier)
+        query = 'delete from %s where hash="%s"' % (self.table,item.identifier)
         if self.connected:
             self.cursor.execute(query)
             self.commit()
@@ -40,8 +47,8 @@ class Connection:
     
     def updateItem(self,item):
         '''Updates an item.'''
-
-        query = 'update todo set content="%s", priority="%s" where hash="%s"' % (item.content,item.priority,item.identifier)
+        query = 'update %s set content="%s", priority="%s" where hash="%s"' \
+            % (self.table,item.content,item.priority,item.identifier)
         if self.connected:
             self.cursor.execute(query)
             self.commit()
@@ -49,11 +56,10 @@ class Connection:
 
     def grabItem(self, identifier, quiet=False):
         '''Given an identifier hash, returns an Item object.'''
-
         identifier = self.matchIdentifier(identifier, quiet)
         if identifier is None:
             return None
-        query = 'select * from todo where hash="%s"' % (identifier)
+        query = 'select * from %s where hash="%s"' % (self.table,identifier)
         if self.connected:
             self.cursor.execute(query)
             row = self.cursor.fetchone()
@@ -65,8 +71,7 @@ class Connection:
 
     def grabMostRecent(self, n=1):
         '''Returns the n most recent items from the database as a list of Item objects.'''
-
-        query = 'select * from todo order by ts desc'
+        query = 'select * from %s order by ts desc' % self.table
         if self.connected:
             self.cursor.execute(query)
             rows = self.cursor.fetchmany(n)
@@ -81,8 +86,7 @@ class Connection:
 
     def grabAll(self):
         '''Returns all items from the database as a list of Item objects.'''
-
-        query = 'select * from todo order by ts desc'
+        query = 'select * from %s order by ts desc' % self.table
         if self.connected:
             self.cursor.execute(query)
             rows = self.cursor.fetchall()
@@ -97,8 +101,7 @@ class Connection:
 
     def matchIdentifier(self,identifier,quiet=False):
         '''Since entering partial identifier hashes is allowed, we need a way to match them'''
-
-        query = 'select hash from todo where hash like "%s%%"' % identifier 
+        query = 'select hash from %s where hash like "%s%%"' % (self.table,identifier)
         if self.connected:
             self.cursor.execute(query)
             rows = self.cursor.fetchall()
@@ -115,7 +118,6 @@ class Connection:
 
     def searchContent(self,searchStr):
         '''Returns a list of Item objects whose content attribute matches the search string.'''
-
         query = 'select * from todo where content match "%s"' % searchStr
         if self.connected:
             self.cursor.execute(query)
@@ -142,7 +144,8 @@ class Connection:
             if self.verbose:
                 print query
             log = open(self.changelog,'a')
-            log.write(query + '\n')
+            identifier = hashlib.md5(str(time.time()) + query).hexdigest()
+            log.write('%s %s\n' % (identifier,query))
             log.close()
             return True
         except:

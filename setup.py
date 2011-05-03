@@ -54,6 +54,8 @@ def setup():
         connection = sqlite3.connect(dbpath)
         c = connection.cursor()
         c.execute('''create virtual table todo using fts4(hash text, content text, priority text, ts datetime)''')
+        c.execute('''create table transactions (hash text, ts datetime)''')
+        connection.commit()
         c.close()
     else:
         print 'Fatal: Database already exists:',path + 'todo.db'

@@ -21,10 +21,3 @@ class Peer:
         command = 'scp %s:%s %s' % (self.address,self.changelog,receivepath)
         print command
         #os.system(command)
-
-def test():
-    testPeer = Peer('serenity')
-    testPeer.push()
-    testPeer.pull()
-
-test()
