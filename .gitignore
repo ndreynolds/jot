@@ -4,3 +4,5 @@ ri.sh
 todo.notes
 # don't need the executable.
 todo
+# don't need .pyc's
+*.pyc

@@ -17,7 +17,7 @@ def show(db,args):
             items = db.grabAll()
         elif sub == 'last':
             items = db.grabMostRecent(1)
-        elif len(sub) == 32:
+        else:
             items = [db.grabItem(sub)]
     else:
         items = db.grabMostRecent(5)
@@ -26,7 +26,8 @@ def show(db,args):
         return False
     if len(items) > 0:
         for item in items:
-            item.display()
+            if item is not None:
+                item.display()
         return True
     print 'No items to display'
     return False

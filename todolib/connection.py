@@ -11,7 +11,7 @@ class Connection:
         self.cursor = None
         self.connected = False
         self.verbose = verbose
-        self.changelog = changelog
+        self.changelog = util.matchPath(changelog,mustExist=False)
         try:
             self.connection = sqlite3.connect(self.path)
             self.cursor = self.connection.cursor()
@@ -22,7 +22,7 @@ class Connection:
     def insertItem(self,item):
         '''Inserts an item.'''
 
-        query = 'insert into todo(hash,descrip,priority,ts) values("%s","%s","%s","%s")' \
+        query = 'insert into todo(hash,content,priority,ts) values("%s","%s","%s","%s")' \
             % (item.identifier, item.content, item.priority, item.timestamp)
         if self.connected:
             self.cursor.execute(query)
@@ -41,16 +41,16 @@ class Connection:
     def updateItem(self,item):
         '''Updates an item.'''
 
-        query = 'update todo where hash="%s"' % (item.identifier)
+        query = 'update todo set content="%s", priority="%s" where hash="%s"' % (item.content,item.priority,item.identifier)
         if self.connected:
             self.cursor.execute(query)
             self.commit()
             self.log(query)
 
-    def grabItem(self, identifier):
+    def grabItem(self, identifier, quiet=False):
         '''Given an identifier hash, returns an Item object.'''
 
-        identifier = self.matchIdentifier(identifier)
+        identifier = self.matchIdentifier(identifier, quiet)
         if identifier is None:
             return None
         query = 'select * from todo where hash="%s"' % (identifier)
@@ -95,7 +95,7 @@ class Connection:
             else:
                 return None
 
-    def matchIdentifier(self,identifier):
+    def matchIdentifier(self,identifier,quiet=False):
         '''Since entering partial identifier hashes is allowed, we need a way to match them'''
 
         query = 'select hash from todo where hash like "%s%%"' % identifier 
@@ -103,13 +103,31 @@ class Connection:
             self.cursor.execute(query)
             rows = self.cursor.fetchall()
             if len(rows) == 0:
-                print util.decorate('FAIL','Fatal: No identifier could be matched')
+                if not quiet:
+                    print util.decorate('FAIL','Fatal: No identifier could be matched')
                 return None 
             if len(rows) > 1:
-                print util.decorate('FAIL','Fatal: Supplied identifier has multiple matches, please be more specific.')
+                if not quiet:
+                    print util.decorate('FAIL','Fatal: Supplied identifier has multiple matches, please be more specific.')
                 return None 
             else:
                 return str(rows[0][0])
+
+    def searchContent(self,searchStr):
+        '''Returns a list of Item objects whose content attribute matches the search string.'''
+
+        query = 'select * from todo where content match "%s"' % searchStr
+        if self.connected:
+            self.cursor.execute(query)
+            rows = self.cursor.fetchall()
+            items = []
+            if len(rows) > 0:
+                for row in rows:
+                    item = Item(db=self,identifier=row[0],content=row[1],priority=row[2],timestamp=row[3])
+                    items.append(item)
+                return items
+            else:
+                return None
 
     def commit(self):
         '''Commit the change(s) to the database.'''
@@ -124,7 +142,7 @@ class Connection:
             if self.verbose:
                 print query
             log = open(self.changelog,'a')
-            log.write(query)
+            log.write(query + '\n')
             log.close()
             return True
         except:

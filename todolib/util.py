@@ -44,13 +44,15 @@ def parseConfig(config,path='~/.todo/todo.config'):
                 config[line[0]] = line[1]
     return config
 
-def matchPath(path):
+def matchPath(path,mustExist=True):
     '''Matches file paths with bash wildcards and shortcuts to an
        absolute path'''
     if path[0] == '~':
         path = os.getenv('HOME') + path[1:]
     newPath = glob.glob(path)
     if len(newPath) == 0:
+        if not mustExist:
+            return path
         print 'Fatal: Could not match path: "%s"' % path
         return False
     newPath = newPath[0]

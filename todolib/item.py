@@ -1,5 +1,5 @@
 import hashlib, os, tempfile, time, util
-from datetime import datetime
+from datetime import datetime 
 
 class Item:
     '''Creates a todo item with an identifier and various methods.'''
@@ -12,9 +12,9 @@ class Item:
         # appropriate parameters.
 
         if timestamp is None:
-            self.timestamp = datetime.now().strftime('%a %b %d %H:%M')
+            self.timestamp = time.time()
         else:
-            self.timestamp = timestamp
+            self.timestamp = float(timestamp)
         if identifier is None:
             self.identifier = hashlib.md5(str(time.time())).hexdigest()
         else:
@@ -39,8 +39,36 @@ class Item:
                 break
         if editor is None:
             editor = 'vim'
-        # Launch the editor with a filename self.identifier in the todo directory
+        # Launch the editor with a tempfile 
         path = tempfile.mkstemp()[1]
+        syscall = editor + ' ' + path
+        os.system(syscall)
+        if os.path.exists(path):
+            fp = open(path,'r')
+            self.content = ''.join([line for line in fp])
+            fp.close()
+            return True
+        else:
+            print 'Aborting'
+            return False
+
+    def edit(self):
+        '''Launch an editor with a tempfile containing the item's content for editing.'''
+        # Look for a default editor using os.getenv
+        envs = ['EDITOR','VISUAL']
+        editor = None
+        for env in envs:
+            env = os.getenv(env)
+            if env is not None:
+                editor = env
+                break
+        if editor is None:
+            editor = 'vim'
+        # Launch the editor with a tempfile 
+        path = tempfile.mkstemp()[1]
+        fp = open(path,'a')
+        fp.write(self.content) # write the current content to the temp file
+        fp.close()
         syscall = editor + ' ' + path
         os.system(syscall)
         if os.path.exists(path):
@@ -55,7 +83,10 @@ class Item:
     def save(self):
         '''Puts the item in the local database.'''
         if self.content is not None:
-            self.db.insertItem(self)
+            if self.db.grabItem(self.identifier,quiet=True) is not None: # update the row if it already exists.
+                self.db.updateItem(self)
+            else:
+                self.db.insertItem(self)
 
     def remove(self):
         '''Removes the item from the local database.'''
@@ -64,14 +95,14 @@ class Item:
     def display(self):
         '''Prints the item's attributes.'''
         content = ''
+        prettyTime = datetime.fromtimestamp(self.timestamp).strftime('%a %b %d %H:%M')
         for ch in self.content:
             if ch == '\n':
                 content += '\n          '
             else:
                 content += ch
         print 'Hash:    ', util.decorate('WARNING',self.identifier)
-        print 'Time:    ', util.decorate('WARNING',self.timestamp)
+        print 'Time:    ', util.decorate('WARNING',prettyTime)
         print 'Priority:', util.decorate('WARNING',self.priority)
         print 'Content: ', content
         print
-

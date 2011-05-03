@@ -33,8 +33,10 @@ def main():
     # Find and import support files
     path = matchPath('~/.todo')
     sys.path.append(path)
+    # Class modules
     from todolib import item, connection, util
-    from todolib import add, version, remove, show, peer, config
+    # Command modules
+    from todolib import add, version, remove, show, peer, config, search, edit
 
     # Parse the configuration file
     config = { 'peers' : {} }
@@ -71,6 +73,10 @@ def main():
         peer.peer(args)
     if command == 'show':
         show.show(db,args)
+    if command == 'search':
+        search.search(db,args)
+    if command == 'edit':
+        edit.edit(db,args)
     return True
 
 def matchPath(path):
