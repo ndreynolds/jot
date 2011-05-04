@@ -1,10 +1,10 @@
 todo
-
+==================================================================================
 todo is a lightweight, CLI To-Do List Manager built with Python and SQLite.
 It offers Git-like commands and methods for de-centralized synchronization, while
 providing expected features and a few new ones, like search and using configurable
 editors.
-==================================================================================
+
 
 Installation
 ----------------------------------------------------------------------------------
@@ -63,6 +63,7 @@ Sometimes it's neccessary to remove an item--obliterating it from record. Like w
 to remove with its identifer or using 'last' like so:
 
 `todo remove [identifier]`
+
 `todo remove last`
 
 Remove also allows the 'all' argument.  This will remove all items.
@@ -79,6 +80,7 @@ The base command will show the five most-recently added items, like so:
 If you want to display a specific item, it can be referenced as in the 'remove' and 'edit' commands.
 
 `todo show [identifier]`
+
 `todo show last`
 
 Likewise, to show all items:
@@ -92,8 +94,11 @@ very simple.  todo just uses scp (which in turn is using ssh) to securely copy l
 machine be accessible via ssh, you have access (via the password or a keyfile), and that todo is already installed on the machine.
 
 There are three commands to interact with a peer:
+
 * push - pushes LOCAL changes to the peer.
+
 * pull - pulls LOCAL changes from the peer.
+
 * clone - makes the local installation identical to the peer.
 
 Local is the most important word above.  Pushes and pulls don't include changes made from other pushes and pulls.  To get those
@@ -104,5 +109,7 @@ The 'push', 'pull', and 'clone' commands all require a reference to a peer.  The
 Some examples:
 
 `todo push ndreynolds@ndreynolds.com`
+
 `todo pull serenity` - where 'serenity' is defined in /etc/hosts
+
 `todo clone 192.168.2.5` - will try to log in using current username
