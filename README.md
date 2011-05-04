@@ -11,19 +11,28 @@ Installation
 It's as simple as cloning the repository and running the install script.
 
 ### Requirements: ###
---A unix-like OS (No Windows support yet)
---Python 2.5+ and a few modules from its standard library
+* A unix-like OS (No Windows support yet)
+
+* Python 2.5+ and a few modules from its standard library
 
 ### Installing: ###
 Clone the Repository
+
 `git clone https://github.com/ndreynolds/todo`
-Step inside the new todo directory
+
+Step inside the new directory
+
 `cd todo`
+
 Run the installation script
+
 `python setup.py`
-If this fails (most likely because your user does not have permission to copy to /usr/local/bin),
+
+If this fails (most likely because your account does not have permission to copy to /usr/local/bin),
 the script may need to be run as root, as shown below:
+
 `sudo python setup.py`
+
 If everything checks out, the installation was successful.
 
 Getting Started
@@ -41,7 +50,7 @@ This will open your default editor and allow you to enter a message. After typin
 save the file and exit the editor.  The program now displays what was added.  Try adding a few more
 items.
 
-* Using the -m flag followed by a string (encapsulated with quotation marks when there's whitespace), adds an
+* Using the -m flag followed by a string (encapsulated with quotation marks if there's whitespace), adds an
 item manually, without opening the editor.
 
 ### Editing an item ###
@@ -110,6 +119,6 @@ Some examples:
 
 `todo push ndreynolds@ndreynolds.com`
 
-`todo pull serenity` - where 'serenity' is defined in /etc/hosts
+`todo pull ndreynolds@serenity` - where 'serenity' is defined in /etc/hosts
 
 `todo clone 192.168.2.5` - will try to log in using current username

@@ -1,7 +1,0 @@
-todo is a CLI To-Do list manager with de-centralized syncing capabilities built 
-with python. It was inspired by git and uses similar command styling and follows
-the same de-centralized approach. The goal is to synchronize a single To-Do list
-on one or more systems, without relying on any central system.  Every system is
-completely independent.  
-
-todo should run on most unix software with python 2.5+ installed.
