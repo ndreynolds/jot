@@ -53,7 +53,11 @@ def setup():
         print 'Initialized database at',dbpath
         connection = sqlite3.connect(dbpath)
         c = connection.cursor()
-        c.execute('''create virtual table todo using fts4(hash text, content text, priority text, ts datetime)''')
+        try:
+            c.execute('''create virtual table todo using fts4(hash text, content text, priority text, ts datetime)''')
+        except sqlite3.OperationalError:
+            print 'Warning--fts3/fts4 not supported. This may affect search speed and accuracy.'
+            c.execute('''create table todo (hash text, content text, priority text, ts datetime)''')
         c.execute('''create table transactions (hash text, ts datetime)''')
         connection.commit()
         c.close()

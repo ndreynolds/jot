@@ -119,8 +119,12 @@ class Connection:
     def searchContent(self,searchStr):
         '''Returns a list of Item objects whose content attribute matches the search string.'''
         query = 'select * from todo where content match "%s"' % searchStr
+        altQuery = 'select * from todo where content like "%%%s%%"' % searchStr
         if self.connected:
-            self.cursor.execute(query)
+            try:
+                self.cursor.execute(query)
+            except sqlite3.OperationalError:
+                self.cursor.execute(altQuery)
             rows = self.cursor.fetchall()
             items = []
             if len(rows) > 0:
