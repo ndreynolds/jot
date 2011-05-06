@@ -6,7 +6,7 @@ def processChangelog(basepath='~/.todo/todo.changelog'):
     path = matchPath(basepath,mustExist=False) + '.*'
     logs = glob.glob(path)
     if len(logs) > 0:
-        print 'Found new changelog. Updating local database...',
+        print 'Found new changelog. Updating local database...'
         trans = Connection(table='transactions')
         count = 0
         for log in logs:
