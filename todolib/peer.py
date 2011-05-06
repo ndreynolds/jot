@@ -11,13 +11,12 @@ class Peer:
     def push(self):
         '''Push the changelog to the peer.'''
         destpath = self.changelog + '.' + hashlib.md5(str(time.time())).hexdigest()
-        command = 'scp %s %s:%s' % (self.changelog,self.address,destpath)
-        print command
+        command = 'scp -q %s %s:%s' % (self.changelog,self.address,destpath)
         os.system(command)
         
     def pull(self):
         '''Pull the changelog from the peer.'''
         receivepath = self.changelog + '.' + hashlib.md5(str(time.time())).hexdigest()
-        command = 'scp %s:%s %s' % (self.address,self.changelog,receivepath)
-        print command
+        command = 'scp -q %s:%s %s' % (self.address,self.changelog,receivepath)
         os.system(command)
+        util.processChangelog() # We can process the changelog immediately

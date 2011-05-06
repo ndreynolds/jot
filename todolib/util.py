@@ -6,9 +6,9 @@ def processChangelog(basepath='~/.todo/todo.changelog'):
     path = matchPath(basepath,mustExist=False) + '.*'
     logs = glob.glob(path)
     if len(logs) > 0:
-        print 'Found new changelog. Updating local database...'
-        trans = Connection(table='transactions',verbose=True)
-        db = Connection()
+        print 'Found new changelog. Updating local database...',
+        trans = Connection(table='transactions')
+        count = 0
         for log in logs:
             logfile = open(log,'r')
             for line in logfile:
@@ -19,8 +19,14 @@ def processChangelog(basepath='~/.todo/todo.changelog'):
                 if trans.matchIdentifier(identifier,quiet=True) is None:
                     trans.rawQuery(query)
                     trans.rawQuery(tquery)
+                    count += 1
             logfile.close()
             os.remove(log)
+        if count > 0:
+            print 'Done.'
+            print decorate('OKGREEN',str(count) + ' changes were made.')
+        else:
+            print 'Nothing to update.'
     return True
 
 def decorate(colorCode,text):
