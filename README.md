@@ -44,7 +44,7 @@ whitespace and a command.  Here's a short tutorial to get started:
 todo creates, manages, and destroys items.  These items have an identifier, timestamp, priority,
 group and content. Let's create a new one:
 
-$ todo add 
+    $ todo add 
 
 This will open your default editor and allow you to enter a message. After typing a short message,
 save the file and exit the editor.  The program now displays what was added.  Try adding a few more
