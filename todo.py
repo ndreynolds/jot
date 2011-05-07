@@ -18,7 +18,8 @@ def main():
     from lib import item, connection, peer
 
     # Command modules
-    from bin import add, version, remove, show, util, config, search, edit, pull, push
+    from bin import add, version, remove, show, util, \
+            config, search, edit, pull, push, clone
 
     # Parse the configuration file
     config = util.parseConfig()
@@ -60,6 +61,8 @@ def main():
         pull.pull(args)
     elif command == 'push':
         push.push(args)
+    elif command == 'clone':
+        clone.clone(db,args)
     else:
         print util.decorate('FAIL','Fatal: Command not recognized.')
         guess = util.guessCommand(command)

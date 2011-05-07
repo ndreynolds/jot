@@ -6,7 +6,7 @@ class Connection:
     '''Creates a sqlite3 database connection and offers methods for selecting, deleting,
        and updating items. All actions are written to the changelog.'''
 
-    def __init__(self,path='~/.todo/todo.db',changelog='~/.todo/todo.changelog',table='todo',verbose=False):
+    def __init__(self,path='~/.todo/todo.db',log='~/.todo/todo.log',changelog='~/.todo/todo.changelog',table='todo',verbose=False):
         '''Constructs a Connection object with option to set locations and verbosity'''
         self.path = util.matchPath(path)
         self.cursor = None
@@ -14,6 +14,7 @@ class Connection:
         self.verbose = verbose
         self.table = table
         self.changelog = util.matchPath(changelog,mustExist=False)
+        self.log = util.matchPath(log,mustExist=False)
         try:
             self.connection = sqlite3.connect(self.path)
             self.cursor = self.connection.cursor()
@@ -27,10 +28,13 @@ class Connection:
             if self.verbose:
                 print query
             self.cursor.execute(query)
-            if commit: # For performance reasons, we don't always want separate transactions for each query
+            if commit: 
                 self.commit()
-            if log:
-                self.log(query) 
+                # For performance reasons, we don't always want separate transactions for each query
+                # SQLite can perform thousands of inserts per second, but usually only about 10 transactions.
+                # A commit triggers a new transaction in the sqlite3 module, for large batches we want as few
+                # transactions as possible to maintain performance.
+            self.log(query,log) 
 
     def insertItem(self,item,commit=True):
         '''Inserts an item.'''
@@ -149,15 +153,29 @@ class Connection:
             return True
         return False
 
-    def log(self,query):
-        '''Logs queries to the changelog which may be distributed to peers.'''
+    def log(self,query,useChlog=True):
+        '''Logs queries to the log (and changelog), for backup and peer use.'''
+
+        # The changelog includes all queries that insert, update, or delete originating from
+        # a local todo command.  
+        #
+        # The log includes all of the above AND queries originating from bin.util.processChangelog().
+        #
+        # Changelogs are copied for pushes and pulls, while logs are used for clones. A log has
+        # everything needed to make a complete db copy, while a changelog only has changes local to the
+        # machine that created it.
+
         try:
             if self.verbose:
                 print query
-            log = open(self.changelog,'a')
             identifier = hashlib.md5(str(time.time()) + query).hexdigest()
+            log = open(self.log,'a')
             log.write('%s %s\n' % (identifier,query))
             log.close()
+            if useChlog:
+                chlog = open(self.changelog,'a')
+                log.write('%s %s\n' % (identifier,query))
+                chlog.close()
             return True
         except:
             return False
