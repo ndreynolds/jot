@@ -18,20 +18,20 @@ It's as simple as cloning the repository and running the install script.
 ### Installing: ###
 Clone the Repository
 
-`git clone https://github.com/ndreynolds/todo`
+$ git clone https://github.com/ndreynolds/todo
 
 Step inside the new directory
 
-`cd todo`
+$ cd todo
 
 Run the installation script
 
-`python setup.py`
+$ python setup.py
 
 If this fails (most likely because your account does not have permission to copy to /usr/local/bin),
 the script may need to be run as root, as shown below:
 
-`sudo python setup.py`
+$ sudo python setup.py
 
 If everything checks out, the installation was successful.
 
@@ -44,7 +44,7 @@ whitespace and a command.  Here's a short tutorial to get started:
 todo creates, manages, and destroys items.  These items have an identifier, timestamp, priority,
 group and content. Let's create a new one:
 
-`todo add` 
+$ todo add 
 
 This will open your default editor and allow you to enter a message. After typing a short message,
 save the file and exit the editor.  The program now displays what was added.  Try adding a few more
@@ -60,41 +60,41 @@ To perform an action on an existing item, we need a way to reference it.  Each i
 for this reason. You only need to enter as many characters of the identifier as are neccessary to uniquely identify
 it to an item. This is rarely more than 4 or 5. 
 
-`todo edit [identifier]`
+$ todo edit [identifier]
 
 Items can also be acted on using 'last' in place of an identifier.
 
-`todo edit last`
+$ todo edit last
 
 ### Removing an item ###
 
 Sometimes it's neccessary to remove an item--obliterating it from record. Like with edit, we can reference an item
 to remove with its identifer or using 'last' like so:
 
-`todo remove [identifier]`
+$ todo remove [identifier]
 
-`todo remove last`
+$ todo remove last
 
 Remove also allows the 'all' argument.  This will remove all items.
 
-`todo remove all`
+$ todo remove all
 
 ### Displaying items ###
 
 The 'show' command is used to display items.  It does not require a reference to an item, although one is allowed.
 The base command will show the five most-recently added items, like so:
 
-`todo show`
+$ todo show
 
 If you want to display a specific item, it can be referenced as in the 'remove' and 'edit' commands.
 
-`todo show [identifier]`
+$ todo show [identifier]
 
-`todo show last`
+$ todo show last
 
 Likewise, to show all items:
 
-`todo show all`
+$ todo show all
 
 ### Syncing with a Peer ###
 
