@@ -1,5 +1,6 @@
-import util, sqlite3, hashlib, time
+import sqlite3, hashlib, time
 from item import Item
+from bin import util 
 
 class Connection:
     '''Creates a sqlite3 database connection and offers methods for selecting, deleting,

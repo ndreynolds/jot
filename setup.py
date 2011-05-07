@@ -5,7 +5,7 @@ def setup():
     base_path = os.getenv('HOME')
     path = base_path + relative_path
     dbpath = path + 'todo.db'
-    cpath = path + 'todo.config'
+    cpath = path + 'todo.conf'
     lbin = '/usr/local/bin'
     sbin = '/usr/bin'
     # Copy todo.py to /usr/local/bin
@@ -69,7 +69,7 @@ def setup():
     # Move the configuration file:
     if not os.path.exists(cpath):
         try:
-            shutil.copy('todo.config',cpath)
+            shutil.copy('todo.conf',cpath)
             print 'Copied std. config to',cpath
         except IOError:
             print 'Fatal: Permission Denied'
@@ -78,7 +78,8 @@ def setup():
             return False
     # Move the support modules:
     try:
-        shutil.copytree('todolib',path + 'todolib')
+        shutil.copytree('lib',path + 'lib')
+        shutil.copytree('bin',path + 'bin')
         print 'Moved support modules to',path
     except IOError:
         print 'Fatal: Permission Denied'

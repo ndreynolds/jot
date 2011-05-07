@@ -2,7 +2,7 @@ import os,glob,time
 
 def processChangelog(basepath='~/.todo/todo.changelog'):
     '''Look for foreign changelogs and update and delete them'''
-    from connection import Connection
+    from lib.connection import Connection
     start = time.time()
     path = matchPath(basepath,mustExist=False) + '.*'
     logs = glob.glob(path)
@@ -64,15 +64,18 @@ def parseArgs(args):
         parsedArgs.append(tup)
     return parsedArgs
 
-def parseConfig(config,path='~/.todo/todo.config'):
-    '''Update configuration with settings from todo.config.'''
+def parseConfig(path='~/.todo/todo.conf'):
+    '''Return dictionary with configuration .'''
     path = matchPath(path)
     configfile = open(path,'r')
+    config = {'debug':False,'editor':'nano'}
     for line in configfile:
-        if line[0].isalpha():
-            line = line.strip().split()
-            if line[1] != '#':
-                config[line[0]] = line[1]
+        if line[0] != '#':
+            line = line.strip().split(':')
+            line = [el.strip() for el in line]
+            if len(line) > 1:
+                if line[1][0] != '#':
+                    config[line[0]] = line[1]
     return config
 
 def matchPath(path,mustExist=True):
@@ -88,3 +91,24 @@ def matchPath(path,mustExist=True):
         return False
     newPath = newPath[0]
     return os.path.abspath(newPath)
+
+def guessCommand(word):
+    '''Tries to 'guess' what the user meant when an unknown command was
+       used.'''
+    knowns = ['add','version','remove','config','peers','show','search', \
+            'edit','pull','push']
+    alphabet = 'abcdefghijklmnopqrstuvwxyz'
+    # uses list comprehensions from norvig.com/spell-correct.html
+    splits     = [(word[:i], word[i:]) for i in range(len(word) + 1)]
+    deletes    = [a + b[1:] for a, b in splits if b]
+    transposes = [a + b[1] + b[0] + b[2:] for a, b in splits if len(b)>1]
+    replaces   = [a + c + b[1:] for a, b in splits for c in alphabet if b]
+    inserts    = [a + c + b for a, b in splits for c in alphabet]
+    # the set of all the edits of the original word
+    edits = set(deletes + transposes + replaces + inserts)
+    # the set of all edits found in matches
+    matches = set(word for word in edits if word in knowns)
+    if len(matches) > 0:
+        return matches
+    else:
+        return None

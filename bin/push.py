@@ -1,4 +1,4 @@
-from peer import Peer
+from lib.peer import Peer
 
 def push(args):
     address = args[0]

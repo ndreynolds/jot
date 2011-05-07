@@ -1,4 +1,5 @@
-import hashlib, os, tempfile, time, util
+import hashlib, os, tempfile, time
+from bin import util 
 from datetime import datetime 
 
 class Item:
@@ -49,7 +50,7 @@ class Item:
             fp.close()
             return True
         else:
-            print 'Aborting'
+            print util.decorate('FAIL','Fatal: Operation Aborted.')
             return False
 
     def edit(self):

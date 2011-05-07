@@ -1,4 +1,4 @@
-from peer import Peer
+from lib.peer import Peer
 
 def pull(args):
     address = args[0]

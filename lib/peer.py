@@ -1,4 +1,5 @@
-import util,hashlib,os,time
+import hashlib,os,time
+from bin import util
 
 class Peer:
     '''Provides methods for interacting with a peer.'''

@@ -1,6 +1,6 @@
 import util
 
-def edit(db,args):
+def edit(db,args,config):
     if len(args) == 0:
         print util.decorate('FAIL','Fatal: No reference to item to edit supplied.')
         return False

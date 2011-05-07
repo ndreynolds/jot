@@ -1,7 +1,7 @@
-from item import Item
+from lib.item import Item
 import util
 
-def add(db,args):
+def add(db,args,config):
     '''Create, fill, save, and display a new todo Item.'''
     #
     # Methods:
