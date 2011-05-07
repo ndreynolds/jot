@@ -14,7 +14,7 @@ class Connection:
         self.verbose = verbose
         self.table = table
         self.changelog = util.matchPath(changelog,mustExist=False)
-        self.log = util.matchPath(log,mustExist=False)
+        self.masterlog = util.matchPath(log,mustExist=False)
         try:
             self.connection = sqlite3.connect(self.path)
             self.cursor = self.connection.cursor()
@@ -156,10 +156,10 @@ class Connection:
     def log(self,query,useChlog=True):
         '''Logs queries to the log (and changelog), for backup and peer use.'''
 
-        # The changelog includes all queries that insert, update, or delete originating from
+        # The change log includes all queries that insert, update, or delete originating from
         # a local todo command.  
         #
-        # The log includes all of the above AND queries originating from bin.util.processChangelog().
+        # The master log includes all of the above AND queries originating from bin.util.processChangelog().
         #
         # Changelogs are copied for pushes and pulls, while logs are used for clones. A log has
         # everything needed to make a complete db copy, while a changelog only has changes local to the
@@ -169,7 +169,7 @@ class Connection:
             if self.verbose:
                 print query
             identifier = hashlib.md5(str(time.time()) + query).hexdigest()
-            log = open(self.log,'a')
+            log = open(self.masterlog,'a')
             log.write('%s %s\n' % (identifier,query))
             log.close()
             if useChlog:
