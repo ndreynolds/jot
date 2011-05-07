@@ -3,11 +3,12 @@ import os,glob,time
 def processChangelog(basepath='~/.todo/todo.changelog'):
     '''Look for foreign changelogs and update and delete them'''
     from connection import Connection
+    start = time.time()
     path = matchPath(basepath,mustExist=False) + '.*'
     logs = glob.glob(path)
     if len(logs) > 0:
         print 'Found new changelog. Updating local database...'
-        trans = Connection(table='transactions')
+        trans = Connection(table='transactions',verbose=False)
         count = 0
         for log in logs:
             logfile = open(log,'r')
@@ -17,9 +18,10 @@ def processChangelog(basepath='~/.todo/todo.changelog'):
                 query = line[33:]
                 tquery = 'insert into transactions(hash,ts) values("%s","%s")' % (identifier,time.time())
                 if trans.matchIdentifier(identifier,quiet=True) is None:
-                    trans.rawQuery(query)
-                    trans.rawQuery(tquery)
+                    trans.rawQuery(query,commit=False)
+                    trans.rawQuery(tquery,commit=False)
                     count += 1
+            trans.commit()
             logfile.close()
             os.remove(log)
         if count > 0:

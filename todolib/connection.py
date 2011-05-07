@@ -20,38 +20,44 @@ class Connection:
         except sqlite3.Error:
             print 'Fatal: Could not connect to database.'
 
-    def rawQuery(self,query):
+    def rawQuery(self,query,commit=True,log=False):
         '''Executes a raw SQL query.'''
         if self.connected:
             if self.verbose:
                 print query
             self.cursor.execute(query)
-            self.commit()
+            if commit: # For performance reasons, we don't always want separate transactions for each query
+                self.commit()
+            if log:
+                self.log(query) 
 
-    def insertItem(self,item):
+    def insertItem(self,item,commit=True):
         '''Inserts an item.'''
         query = 'insert into %s(hash,content,priority,ts) values("%s","%s","%s","%s")' \
             % (self.table,item.identifier, item.content, item.priority, item.timestamp)
         if self.connected:
             self.cursor.execute(query)
-            self.commit()
+            if commit:
+                self.commit()
             self.log(query) # Need to log any queries that add, remove, or modify table rows
 
-    def deleteItem(self,item):
+    def deleteItem(self,item,commit=True):
         '''Deletes an item.'''
         query = 'delete from %s where hash="%s"' % (self.table,item.identifier)
         if self.connected:
             self.cursor.execute(query)
-            self.commit()
+            if commit:
+                self.commit()
             self.log(query)
     
-    def updateItem(self,item):
+    def updateItem(self,item,commit=True):
         '''Updates an item.'''
         query = 'update %s set content="%s", priority="%s" where hash="%s"' \
             % (self.table,item.content,item.priority,item.identifier)
         if self.connected:
             self.cursor.execute(query)
-            self.commit()
+            if commit:
+                self.commit()
             self.log(query)
 
     def grabItem(self, identifier, quiet=False):

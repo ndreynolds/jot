@@ -1,35 +1,10 @@
 #!/usr/bin/env python
 
-import sys, glob, os
+import sys, glob, os, time
     
-# Overview:
-#   The program is run by typing todo in to the shell followed
-#   by a single whitespace, a command that tells it what to do,
-#   and possibly subcommands and/or arguments.
-#
-# Examples:
-#   todo show
-#       --lists 5 most recent todo items
-#   todo add    
-#       --opens the default editor to enter a todo item
-#   todo add -m "item text"   
-#       --the same thing without using an editor
-#   todo version 
-#       --displays version information
-#   todo config show
-#       --opens the configuration file in the default editor
-#   todo remove [hash]
-#       --removes the todo item with the given hash identifier
-#   todo remove last
-#       --removes the most recently created todo item
-#   todo remove all
-#       --removes all todo items
-#   todo peers show
-#       --lists peers from the todo.config file
-
 def main():
     '''Get, interpret, and pass on any commands'''
-
+    
     # Find and import support files
     path = matchPath('~/.todo')
     sys.path.append(path)
@@ -63,24 +38,26 @@ def main():
     # command-specific function.
     if command == 'add':
         add.add(db,args)
-    if command == 'version':
+    elif command == 'version':
         version.version()
-    if command == 'remove':
+    elif command == 'remove':
         remove.remove(db,args)
-    if command == 'config':
+    elif command == 'config':
         config.config(args)
-    if command == 'peers':
+    elif command == 'peers':
         peer.peer(args)
-    if command == 'show':
+    elif command == 'show':
         show.show(db,args)
-    if command == 'search':
+    elif command == 'search':
         search.search(db,args)
-    if command == 'edit':
+    elif command == 'edit':
         edit.edit(db,args)
-    if command == 'pull':
+    elif command == 'pull':
         pull.pull(args)
-    if command == 'push':
+    elif command == 'push':
         push.push(args)
+    else:
+        return False
     return True
 
 def matchPath(path):
