@@ -9,9 +9,11 @@ def add(db,args,config):
     #       --opens the default editor with a temp file. 
     #   add -m "string"
     #       --uses the supplied string as the item content.
-    #
+
     manual = False
+    quiet = False
     content = None
+    batchMode = False
     priority = 'Normal'
     for tup in args:
         arg1 = tup[0]
@@ -20,15 +22,20 @@ def add(db,args,config):
             manual = True
             content = arg2
         if arg1 == '-high' or arg1 == 'h':
-            prior = 'High'
+            priority = 'High'
         if arg1 == '-low' or arg1 == 'l':
-            prior = 'Low'
+            priority = 'Low'
+        if arg1 == '-quiet' or arg1 == 'q':
+            quiet = True
+        if arg1 == '-batch' or arg1 == 'b':
+            batchMode = True
     if manual:
         item = Item(db,content=content,priority=priority)
     else:
         item = Item(db,priority=priority)
         item.fill()
     item.save()
-    print util.decorate('OKGREEN','New item addition was successful.\n')
-    item.display()
+    if not quiet:
+        print util.decorate('OKGREEN','New item addition was successful.\n')
+        item.display()
     return True

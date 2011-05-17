@@ -81,17 +81,17 @@ class Item:
             print 'Aborting'
             return False
         
-    def save(self):
+    def save(self,commit=True):
         '''Puts the item in the local database.'''
         if self.content is not None:
             if self.db.grabItem(self.identifier,quiet=True) is not None: # update the row if it already exists.
-                self.db.updateItem(self)
+                self.db.updateItem(self,commit)
             else:
-                self.db.insertItem(self)
+                self.db.insertItem(self,commit)
 
-    def remove(self):
+    def remove(self,commit=True):
         '''Removes the item from the local database.'''
-        self.db.deleteItem(self)
+        self.db.deleteItem(self,commit)
 
     def display(self):
         '''Prints the item's attributes.'''

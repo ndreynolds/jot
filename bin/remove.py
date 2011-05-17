@@ -23,8 +23,9 @@ def remove(db,args):
         removed = 0 
         for item in items:
             if item is not None:
-                item.remove()
+                item.remove(commit=False)
                 print 'Removed',util.decorate('WARNING',item.identifier)
                 removed += 1
+        db.commit()
         if removed > 0:
             print util.decorate('OKGREEN',str(removed) + ' item(s) successfully removed.')
