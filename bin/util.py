@@ -1,34 +1,49 @@
 import os,glob,time
+from StringIO import StringIO
+try: import cPickle as pickle
+except: import pickle
+from lib.log import Log
 
 def processChangelog(basepath='~/.todo/todo.changelog'):
     '''Look for foreign changelogs and update and delete them'''
     from lib.connection import Connection
-    start = time.time()
     path = matchPath(basepath,mustExist=False) + '.*'
-    logs = glob.glob(path)
-    if len(logs) > 0:
+    logfiles = glob.glob(path)
+
+    def writeQuery(db,log):
+        '''Executes the query and records the transaction'''
+        if db.matchIdentifier(log.identifier,quiet=True) is None:
+            if log.values is not None:
+                db.rawQuery(log.query,log.values,commit=False)
+            else:
+                db.rawQuery(log.query,commit=False)
+            transaction = 'insert into transactions(hash,ts) values("%s","%s")' % (log.identifier,time.time()) 
+            db.rawQuery(transaction,commit=False)
+            return True
+        return False
+
+    if len(logfiles) > 0:
         print 'Found new changelog. Updating local database...'
-        trans = Connection(table='transactions',verbose=False)
-        count = 0
-        for log in logs:
-            logfile = open(log,'r')
-            for line in logfile:
-                line = line.strip()
-                identifier = line[0:32]
-                query = line[33:]
-                tquery = 'insert into transactions(hash,ts) values("%s","%s")' % (identifier,time.time())
-                if trans.matchIdentifier(identifier,quiet=True) is None:
-                    trans.rawQuery(query,commit=False)
-                    trans.rawQuery(tquery,commit=False)
-                    count += 1
-            trans.commit()
-            logfile.close()
-            os.remove(log)
-        if count > 0:
+        db = Connection(table='transactions',verbose=False)
+        changesCount = 0
+        for logfile in logfiles:
+            fp = open(logfile,'rb')
+            while True:
+                try:
+                    log = pickle.load(fp)
+                    if writeQuery(db,log):
+                        changesCount += 1
+                except EOFError:
+                    break
+            fp.close()
+            #os.remove(logfile)
+        db.commit()
+        if changesCount > 0:
             print 'Done.'
-            print decorate('OKGREEN',str(count) + ' changes were made.')
+            print decorate('OKGREEN',str(changesCount) + ' changes were made.')
         else:
             print 'Nothing to update.'
+
     return True
 
 def decorate(colorCode,text):

@@ -1,5 +1,8 @@
-import sqlite3, hashlib, time
+import sqlite3, hashlib, time, pickle
+try: import cPickle as pickle
+except: import pickle
 from item import Item
+from log import Log
 from bin import util 
 
 class Connection:
@@ -22,12 +25,20 @@ class Connection:
         except sqlite3.Error:
             print 'Fatal: Could not connect to database.'
 
-    def rawQuery(self,query,commit=True,log=False):
+    def rawQuery(self,query,values=None,commit=True,log=False):
         '''Executes a raw SQL query.'''
         if self.connected:
             if self.verbose:
                 print query
-            self.cursor.execute(query)
+
+            # If possible, we'll still want to use the ? format to escape what's added to the query
+            # to prevent SQL injection. For this reason, the values parameter is available. It should
+            # be a tuple with the appropriate number of elements.
+            if values is not None:
+                self.cursor.execute(query,values)
+            else:
+                self.cursor.execute(query)
+
             if commit: 
                 self.commit()
                 # For performance reasons, we don't always want separate transactions for each query
@@ -38,41 +49,45 @@ class Connection:
 
     def insertItem(self,item,commit=True):
         '''Inserts an item.'''
-        query = 'insert into %s(hash,content,priority,ts) values("%s","%s","%s","%s")' \
-            % (self.table,item.identifier, item.content, item.priority, item.timestamp)
+        values = (item.identifier, item.content, item.priority, item.timestamp)
+        # Need to use the ? to insert variables in to the query to protect against injection 
+        # We do, however, need to add the table name without escaping.
+        query = 'insert into %s(hash,content,priority,ts) values(?,?,?,?)' % self.table
         if self.connected:
-            self.cursor.execute(query)
+            self.cursor.execute(query,values)
             if commit:
                 self.commit()
-            self.log(query) # Need to log any queries that add, remove, or modify table rows
+            self.log(query,values) # Need to log any queries that add, remove, or modify table rows
 
     def deleteItem(self,item,commit=True):
         '''Deletes an item.'''
-        query = 'delete from %s where hash="%s"' % (self.table,item.identifier)
+        values = (item.identifier,)
+        query = 'delete from %s where hash=?' % self.table
         if self.connected:
-            self.cursor.execute(query)
+            self.cursor.execute(query,values)
             if commit:
                 self.commit()
-            self.log(query)
+            self.log(query,values)
     
     def updateItem(self,item,commit=True):
         '''Updates an item.'''
-        query = 'update %s set content="%s", priority="%s" where hash="%s"' \
-            % (self.table,item.content,item.priority,item.identifier)
+        values = (item.content,item.priority,item.identifier)
+        query = 'update %s set content=?, priority=? where hash=?' % self.table
         if self.connected:
-            self.cursor.execute(query)
+            self.cursor.execute(query,values)
             if commit:
                 self.commit()
-            self.log(query)
+            self.log(query,values)
 
     def grabItem(self, identifier, quiet=False):
         '''Given an identifier hash, returns an Item object.'''
         identifier = self.matchIdentifier(identifier, quiet)
         if identifier is None:
             return None
-        query = 'select * from %s where hash="%s"' % (self.table,identifier)
+        values = (identifier,)
+        query = 'select * from %s where hash=?' % self.table
         if self.connected:
-            self.cursor.execute(query)
+            self.cursor.execute(query,values)
             row = self.cursor.fetchone()
             if row is not None:
                 item = Item(db=self,identifier=row[0],content=row[1],priority=row[2],timestamp=row[3])
@@ -112,9 +127,10 @@ class Connection:
 
     def matchIdentifier(self,identifier,quiet=False):
         '''Since entering partial identifier hashes is allowed, we need a way to match them'''
-        query = 'select hash from %s where hash like "%s%%"' % (self.table,identifier)
+        values = ('%' + identifier + '%',)
+        query = 'select hash from %s where hash like ?' % self.table
         if self.connected:
-            self.cursor.execute(query)
+            self.cursor.execute(query,values)
             rows = self.cursor.fetchall()
             if len(rows) == 0:
                 if not quiet:
@@ -129,13 +145,14 @@ class Connection:
 
     def searchContent(self,searchStr):
         '''Returns a list of Item objects whose content attribute matches the search string.'''
-        query = 'select * from todo where content match "%s"' % searchStr
-        altQuery = 'select * from todo where content like "%%%s%%"' % searchStr
+        values = (searchStr,)
+        query = 'select * from todo where content match ?'
+        altQuery = 'select * from todo where content like "%?%"'
         if self.connected:
             try:
-                self.cursor.execute(query)
+                self.cursor.execute(query,values)
             except sqlite3.OperationalError:
-                self.cursor.execute(altQuery)
+                self.cursor.execute(altQuery,values)
             rows = self.cursor.fetchall()
             items = []
             if len(rows) > 0:
@@ -153,7 +170,7 @@ class Connection:
             return True
         return False
 
-    def log(self,query,useChlog=True):
+    def log(self,query,values=None,useChlog=True):
         '''Logs queries to the log (and changelog), for backup and peer use.'''
 
         # The change log includes all queries that insert, update, or delete originating from
@@ -164,19 +181,15 @@ class Connection:
         # Changelogs are copied for pushes and pulls, while logs are used for clones. A log has
         # everything needed to make a complete db copy, while a changelog only has changes local to the
         # machine that created it.
-
-        try:
-            if self.verbose:
-                print query
-            identifier = hashlib.md5(str(time.time()) + query).hexdigest()
-            log = open(self.masterlog,'a')
-            log.write('%s %s\n' % (identifier,query))
-            log.close()
-            if useChlog:
-                chlog = open(self.changelog,'a')
-                log.write('%s %s\n' % (identifier,query))
-                chlog.close()
-            return True
-        except:
-            return False
-
+        if self.verbose:
+            print query
+        identifier = hashlib.md5(str(time.time()) + query).hexdigest()
+        log = Log(identifier,query,values)
+        logfile = open(self.masterlog,'ab')
+        pickle.dump(log,logfile)
+        logfile.close()
+        if useChlog:
+            chlogfile = open(self.changelog,'ab')
+            pickle.dump(log,chlogfile)
+            chlogfile.close()
+        return True
