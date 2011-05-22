@@ -3,3 +3,5 @@ class Log:
         self.query = query
         self.values = values
         self.identifier = identifier
+    def display(self):
+        print self.identifier,self.query,self.values

@@ -36,7 +36,7 @@ def processChangelog(basepath='~/.todo/todo.changelog'):
                 except EOFError:
                     break
             fp.close()
-            #os.remove(logfile)
+            os.remove(logfile)
         db.commit()
         if changesCount > 0:
             print 'Done.'
