@@ -5,13 +5,19 @@ except ImportError: import pickle
 
 def log(args,config):
     '''Unpickles and dumps the todo log. Only really useful
-    for development.'''
+    for development.''' 
     
-    logfile = open(util.matchPath('~/.todo/todo.log'),'r')
-    while True:
-        try:
-            logitem = pickle.load(logfile)
-            logitem.display()
-        except EOFError:
-            break
+    def logDump(logPath):
+        path = util.matchPath(logPath)
+        print '#',path
+        logfile = open(path,'r')
+        while True:
+            try:
+                logitem = pickle.load(logfile)
+                logitem.display()
+            except EOFError:
+                break
+
+    logDump('~/.todo/todo.log')
+    logDump('~/.todo/todo.changelog')
     return True

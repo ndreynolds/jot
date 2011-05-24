@@ -183,7 +183,7 @@ class Connection:
         # machine that created it.
         if self.verbose:
             print query
-        identifier = hashlib.md5(str(time.time()) + query).hexdigest()
+        identifier = hashlib.md5(str(time.time()) + values).hexdigest()
         log = Log(identifier,query,values)
         logfile = open(self.masterlog,'ab')
         pickle.dump(log,logfile)
