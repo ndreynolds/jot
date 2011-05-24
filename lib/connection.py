@@ -45,7 +45,7 @@ class Connection:
                 # SQLite can perform thousands of inserts per second, but usually only about 10 transactions.
                 # A commit triggers a new transaction in the sqlite3 module, for large batches we want as few
                 # transactions as possible to maintain performance.
-            self.log(query,log) 
+            self.log(query,values,log) 
 
     def insertItem(self,item,commit=True):
         '''Inserts an item.'''
