@@ -48,7 +48,7 @@ def setup(config):
         connection = sqlite3.connect(dbpath)
         c = connection.cursor()
         try:
-            c.execute('''create virtual table todo using fts4(hash text, content text, priority text, ts datetime)''')
+            c.execute('''create virtual table todo using fts4(hash text, content text, priority text, tags text, ts datetime)''')
         except sqlite3.OperationalError:
             print 'Warning--fts3/fts4 not supported. Falling back to basic table, this may affect search speed and accuracy.'
             c.execute('''create table todo (hash text, content text, priority text, ts datetime)''')

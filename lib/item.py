@@ -4,7 +4,7 @@ from datetime import datetime
 
 class Item:
     '''Creates a todo item with an identifier and various methods.'''
-    def __init__(self, db, identifier=None, priority=None, content=None, timestamp=None):
+    def __init__(self, db, identifier=None, priority=None, content=None, tags=None, timestamp=None):
         '''Creates a new todo item, with new or preset attributes'''
 
         # By setting parameters, we can create a clone of any previous Item instance that's
@@ -24,6 +24,15 @@ class Item:
             self.priority = priority
         else:
             self.priority = priority
+        if tags is None or type(tags) is not list:
+            self.tags = []
+        if tags[0] == '': 
+            # the Connection object will initialize items with tag parameters as a list 
+            # containing a single empty string (when the tags field is empty). This seems 
+            # to be the cleanest way to take care of this.
+            self.tags = []
+        else:
+            self.tags = tags
         self.content = content
         self.db = db
 
@@ -105,5 +114,6 @@ class Item:
         print 'Hash:    ', util.decorate('WARNING',self.identifier)
         print 'Time:    ', util.decorate('WARNING',prettyTime)
         print 'Priority:', util.decorate('WARNING',self.priority)
+        print 'Tags:    ', util.decorate('OKGREEN',','.join(self.tags))
         print 'Content: ', content
         print

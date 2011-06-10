@@ -111,7 +111,7 @@ def guessCommand(word):
     '''Tries to 'guess' what the user meant when an unknown command was
        used.'''
     knowns = ['add','version','remove','config','peers','show','search', \
-            'edit','pull','push']
+            'edit','pull','push','tag','clone']
     alphabet = 'abcdefghijklmnopqrstuvwxyz'
     # uses list comprehensions from norvig.com/spell-correct.html
     splits     = [(word[:i], word[i:]) for i in range(len(word) + 1)]

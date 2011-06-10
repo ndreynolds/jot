@@ -19,7 +19,8 @@ def main():
 
     # Command modules
     from bin import add, version, remove, show, util, \
-            config, search, edit, pull, push, clone, log
+            config, search, edit, pull, push, clone, \
+            log, tag
 
     # Parse the configuration file
     config = util.parseConfig()
@@ -65,6 +66,8 @@ def main():
         clone.clone(db,args)
     elif command == 'log':
         log.log(args,config)
+    elif command == 'tag':
+        tag.tag(db,args)
     else:
         print util.decorate('FAIL','Fatal: Command not recognized.')
         guess = util.guessCommand(command)

@@ -49,10 +49,10 @@ class Connection:
 
     def insertItem(self,item,commit=True):
         '''Inserts an item.'''
-        values = (item.identifier, item.content, item.priority, item.timestamp)
+        values = (item.identifier, item.content, item.priority, ','.join(item.tags), item.timestamp)
         # Need to use the ? to insert variables in to the query to protect against injection 
         # We do, however, need to add the table name without escaping.
-        query = 'insert into %s(hash,content,priority,ts) values(?,?,?,?)' % self.table
+        query = 'insert into %s(hash,content,priority,tags,ts) values(?,?,?,?,?)' % self.table
         if self.connected:
             self.cursor.execute(query,values)
             if commit:
@@ -71,8 +71,8 @@ class Connection:
     
     def updateItem(self,item,commit=True):
         '''Updates an item.'''
-        values = (item.content,item.priority,item.identifier)
-        query = 'update %s set content=?, priority=? where hash=?' % self.table
+        values = (item.content, item.priority, ','.join(item.tags), item.identifier)
+        query = 'update %s set content=?, priority=?, tags=? where hash=?' % self.table
         if self.connected:
             self.cursor.execute(query,values)
             if commit:
@@ -90,7 +90,7 @@ class Connection:
             self.cursor.execute(query,values)
             row = self.cursor.fetchone()
             if row is not None:
-                item = Item(db=self,identifier=row[0],content=row[1],priority=row[2],timestamp=row[3])
+                item = Item(db=self, identifier=row[0], content=row[1], priority=row[2], tags=row[3].split(','), timestamp=row[4])
                 return item
             else:
                 return None
@@ -104,7 +104,7 @@ class Connection:
             items = []
             if len(rows) > 0:
                 for row in rows:
-                    item = Item(db=self,identifier=row[0],content=row[1],priority=row[2],timestamp=row[3])
+                    item = Item(db=self,identifier=row[0], content=row[1], priority=row[2], tags=row[3].split(','), timestamp=row[4])
                     items.append(item)
                 return items
             else:
@@ -119,7 +119,7 @@ class Connection:
             items = []
             if len(rows) > 0:
                 for row in rows:
-                    item = Item(db=self,identifier=row[0],content=row[1],priority=row[2],timestamp=row[3])
+                    item = Item(db=self, identifier=row[0], content=row[1], priority=row[2], tags=row[3].split(','), timestamp=row[4])
                     items.append(item)
                 return items
             else:
@@ -127,7 +127,7 @@ class Connection:
 
     def matchIdentifier(self,identifier,quiet=False):
         '''Since entering partial identifier hashes is allowed, we need a way to match them'''
-        values = ('%' + identifier + '%',)
+        values = (identifier + '%',)
         query = 'select hash from %s where hash like ?' % self.table
         if self.connected:
             self.cursor.execute(query,values)
@@ -157,7 +157,7 @@ class Connection:
             items = []
             if len(rows) > 0:
                 for row in rows:
-                    item = Item(db=self,identifier=row[0],content=row[1],priority=row[2],timestamp=row[3])
+                    item = Item(db=self, identifier=row[0], content=row[1], priority=row[2], tags=row[3].split(','), timestamp=row[4])
                     items.append(item)
                 return items
             else:
