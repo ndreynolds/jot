@@ -7,7 +7,7 @@ def remove(db,args):
     #   remove [identifier]
     #       --removes the item with the given identifier.
     #   remove all
-    #       --removes all todo items.
+    #       --removes all jot items.
     #   remove last
     #       --removes the most recent item.
     #

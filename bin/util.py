@@ -4,7 +4,7 @@ try: import cPickle as pickle
 except: import pickle
 from lib.log import Log
 
-def processChangelog(basepath='~/.todo/todo.changelog'):
+def processChangelog(basepath='~/.jot/jot.changelog'):
     '''Look for foreign changelogs and update and delete them'''
     from lib.connection import Connection
     path = matchPath(basepath,mustExist=False) + '.*'
@@ -79,7 +79,7 @@ def parseArgs(args):
         parsedArgs.append(tup)
     return parsedArgs
 
-def parseConfig(path='~/.todo/todo.conf'):
+def parseConfig(path='~/.jot/jot.conf'):
     '''Return dictionary with configuration .'''
     path = matchPath(path)
     configfile = open(path,'r')

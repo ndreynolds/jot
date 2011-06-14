@@ -4,7 +4,7 @@ from bin import util
 class Peer:
     '''Provides methods for interacting with a peer.'''
 
-    def __init__(self,address,changelog='~/.todo/todo.changelog',log='~/.todo/todo.log'):
+    def __init__(self,address,changelog='~/.jot/jot.changelog',log='~/.jot/jot.log'):
         '''Creates a Peer object with an address'''
         self.address = address
         self.changelog = changelog

@@ -1,36 +1,36 @@
 def setup(config):
-    '''Puts todo.py in bin, Makes the directory, database, and config file for todo'''
+    '''Puts jot.py in bin, Makes the directory, database, and config file for jot'''
     import os,stat,shutil,sqlite3
     from bin import util
     # Set options from config
     install_path = config['--path'] 
     # Everything else is based on $HOME
-    relative_path = '/.todo/'
+    relative_path = '/.jot/'
     base_path = os.getenv('HOME')
     path = base_path + relative_path
-    dbpath = path + 'todo.db'
-    cpath = path + 'todo.conf'
-    # Copy todo.py to install_path 
+    dbpath = path + 'jot.db'
+    cpath = path + 'jot.conf'
+    # Copy jot.py to install_path 
     try:
-        shutil.copy('todo.py','todo') # Strip .py
+        shutil.copy('jot.py','jot') # Strip .py
     except IOError:
         print 'Fatal: Permission Denied'
-        print 'todo was trying to make a copy of todo.py as todo'
-        print 'A copy of file "todo" most likely already exists, and you lack permission to overwrite it.'
+        print 'jot was trying to make a copy of jot.py as jot'
+        print 'A copy of file "jot" most likely already exists, and you lack permission to overwrite it.'
         print 'Try running:'
         print '    sudo python setup.py'
         return False
-    os.chmod('todo',0755) # Make it executable
+    os.chmod('jot',0755) # Make it executable
     if os.path.exists(install_path):
         try:
-            shutil.copy('todo',install_path)
-            print 'Moved todo to',install_path
+            shutil.copy('jot',install_path)
+            print 'Moved jot to',install_path
         except IOError:
             print 'Fatal: Permission Denied'
-            print 'todo was trying to move the executable to',install_path
+            print 'jot was trying to move the executable to',install_path
             print 'Try running:'
             print '    sudo python setup.py'
-            print 'Or install todo in a directory you own with:'
+            print 'Or install jot in a directory you own with:'
             print '    python setup.py --path [path]'
             return False
     # Make the directory:
@@ -39,8 +39,8 @@ def setup(config):
         os.mkdir(path)
     else:
         print 'Fatal: Base directory already exists:',path
-        print 'To remove todo, run:'
-        print '    todo remove'
+        print 'To remove jot, run:'
+        print '    jot remove'
         return False
     # Make the database:
     if not os.path.exists(dbpath):
@@ -48,22 +48,22 @@ def setup(config):
         connection = sqlite3.connect(dbpath)
         c = connection.cursor()
         try:
-            c.execute('''create virtual table todo using fts4(hash text, content text, priority text, tags text, ts datetime)''')
+            c.execute('''create virtual table jot using fts4(hash text, content text, priority text, tags text, ts datetime)''')
         except sqlite3.OperationalError:
             print 'Warning--fts3/fts4 not supported. Falling back to basic table, this may affect search speed and accuracy.'
-            c.execute('''create table todo (hash text, content text, priority text, ts datetime)''')
+            c.execute('''create table jot (hash text, content text, priority text, ts datetime)''')
         c.execute('''create table transactions (hash text, ts datetime)''')
         connection.commit()
         c.close()
     else:
-        print 'Fatal: Database already exists:',path + 'todo.db'
-        print 'To remove todo, run:'
-        print '    todo remove'
+        print 'Fatal: Database already exists:',path + 'jot.db'
+        print 'To remove jot, run:'
+        print '    jot remove'
         return False
     # Move the configuration file:
     if not os.path.exists(cpath):
         try:
-            shutil.copy('todo.conf',cpath)
+            shutil.copy('jot.conf',cpath)
             print 'Copied std. config to',cpath
         except IOError:
             print 'Fatal: Permission Denied'
@@ -79,7 +79,7 @@ def setup(config):
         print 'Fatal: Permission Denied'
         print '''Try running:
                     sudo python setup.py'''
-    # Change the ownership of .todo:
+    # Change the ownership of .jot:
     # 
     # Why? When sudo is used to run this, root owns the directory which causes problems connecting to the db
     # as a normal user. To fix this, we first need to determine whether sudo was used to run this script. 
@@ -92,7 +92,7 @@ def setup(config):
         os.chmod(path,0777)
         os.chmod(dbpath,0777)
     except OSError:
-        print 'Fatal: Could not set database permissions. todo needs write access to the database.'
+        print 'Fatal: Could not set database permissions. jot needs write access to the database.'
         return False
     return True
 

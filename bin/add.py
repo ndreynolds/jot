@@ -2,7 +2,7 @@ from lib.item import Item
 import util
 
 def add(db, args, config):
-    '''Create, fill, save, and display a new todo Item.'''
+    '''Create, fill, save, and display a new jot Item.'''
     #
     # Arguments:
     #   [none]     

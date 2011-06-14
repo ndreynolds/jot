@@ -1,4 +1,4 @@
 def version():
     '''Displays version information.'''
-    print 'todo v 0.0.1'
+    print 'jot v 1.2.1'
     return True

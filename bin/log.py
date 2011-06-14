@@ -4,7 +4,7 @@ try: import cPickle as pickle
 except ImportError: import pickle
 
 def log(args,config):
-    '''Unpickles and dumps the todo log. Only really useful
+    '''Unpickles and dumps the jot log. Only really useful
     for development.''' 
     
     def logDump(logPath):
@@ -18,6 +18,6 @@ def log(args,config):
             except EOFError:
                 break
 
-    logDump('~/.todo/todo.log')
-    logDump('~/.todo/todo.changelog')
+    logDump('~/.jot/jot.log')
+    logDump('~/.jot/jot.changelog')
     return True

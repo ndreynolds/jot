@@ -9,7 +9,7 @@ class Connection:
     '''Creates a sqlite3 database connection and offers methods for selecting, deleting,
        and updating items. All actions are written to the changelog.'''
 
-    def __init__(self,path='~/.todo/todo.db',log='~/.todo/todo.log',changelog='~/.todo/todo.changelog',table='todo',verbose=False):
+    def __init__(self,path='~/.jot/jot.db',log='~/.jot/jot.log',changelog='~/.jot/jot.changelog',table='jot',verbose=False):
         '''Constructs a Connection object with option to set locations and verbosity'''
         self.path = util.matchPath(path)
         self.cursor = None
@@ -146,8 +146,8 @@ class Connection:
     def searchContent(self,searchStr):
         '''Returns a list of Item objects whose content attribute matches the search string.'''
         values = (searchStr,)
-        query = 'select * from todo where content match ?'
-        altQuery = 'select * from todo where content like "%?%"'
+        query = 'select * from jot where content match ?'
+        altQuery = 'select * from jot where content like "%?%"'
         if self.connected:
             try:
                 self.cursor.execute(query,values)
@@ -174,7 +174,7 @@ class Connection:
         '''Logs queries to the log (and changelog), for backup and peer use.'''
 
         # The change log includes all queries that insert, update, or delete originating from
-        # a local todo command.  
+        # a local jot command.  
         #
         # The master log includes all of the above AND queries originating from bin.util.processChangelog().
         #

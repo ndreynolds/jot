@@ -11,7 +11,7 @@ def search(db,args):
         query = args[0]
         items = db.searchContent(query)
     else:
-        print util.decorate('FAIL', 'Requires a search parameter.\n    usage: todo search [query]')
+        print util.decorate('FAIL', 'Requires a search parameter.\n    usage: jot search [query]')
         return False
     if items is None:
         print util.decorate('WARNING', 'No matches found for "%s"' % query)

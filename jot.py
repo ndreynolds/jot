@@ -3,15 +3,15 @@
 import sys, glob, os, time
     
 usage = '''
-Usage:    todo [command]
-For help: todo help
+Usage:    jot [command]
+For help: jot help
 '''
     
 def main():
     '''Get, interpret, and pass on any commands'''
     
     # Find and import support files
-    path = os.getenv('HOME') + '/.todo'
+    path = os.getenv('HOME') + '/.jot'
     sys.path.append(path)
 
     # Class modules

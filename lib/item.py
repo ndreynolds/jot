@@ -3,9 +3,9 @@ from bin import util
 from datetime import datetime 
 
 class Item:
-    '''Creates a todo item with an identifier and various methods.'''
+    '''Creates a jot item with an identifier and various methods.'''
     def __init__(self, db, identifier=None, priority=None, content=None, tags=None, timestamp=None):
-        '''Creates a new todo item, with new or preset attributes'''
+        '''Creates a new jot item, with new or preset attributes'''
 
         # By setting parameters, we can create a clone of any previous Item instance that's
         # attributes are saved in the database. This is handled by giving an identifier to

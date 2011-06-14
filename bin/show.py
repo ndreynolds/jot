@@ -5,7 +5,7 @@ def show(db,args):
     #   show
     #       --displays the 5 most recent items.
     #   show all 
-    #       --displays all todo items.
+    #       --displays all jot items.
     #   show [identifier]
     #       --shows the item with the given identifier.
     #   show last
