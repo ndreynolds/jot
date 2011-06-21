@@ -17,6 +17,12 @@ def show(db,args):
             items = db.grabAll()
         elif sub == 'last':
             items = db.grabMostRecent(1)
+        elif sub == 'last^':
+            items = db.grabMostRecent(1,1)
+        elif sub == 'last^^':
+            items = db.grabMostRecent(1,2)
+        elif sub[0:5] == 'last~' and len(sub) == 6:
+            items = db.grabMostRecent(1,int(sub[5]))
         else:
             items = [db.grabItem(sub)]
     else:

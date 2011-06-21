@@ -95,18 +95,18 @@ class Connection:
             else:
                 return None
 
-    def grabMostRecent(self, n=1):
-        '''Returns the n most recent items from the database as a list of Item objects.'''
+    def grabMostRecent(self, n=1, offset=0):
+        '''Returns the n most recent items, with an optional offset, from the database as a list of Item objects.'''
         query = 'select * from %s order by ts desc' % self.table
         if self.connected:
             self.cursor.execute(query)
-            rows = self.cursor.fetchmany(n)
+            rows = self.cursor.fetchmany(n + offset)
             items = []
             if len(rows) > 0:
                 for row in rows:
                     item = Item(db=self,identifier=row[0], content=row[1], priority=row[2], tags=row[3].split(','), timestamp=row[4])
                     items.append(item)
-                return items
+                return items[offset:len(items)]
             else:
                 return None
 
