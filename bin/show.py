@@ -1,16 +1,6 @@
 def show(db,args):
     '''Display saved items in a variety of ways.'''
-    #
-    # Methods:
-    #   show
-    #       --displays the 5 most recent items.
-    #   show all 
-    #       --displays all jot items.
-    #   show [identifier]
-    #       --shows the item with the given identifier.
-    #   show last
-    #       --shows the most recent item.
-    #
+
     if len(args) > 0:
         sub = args[0]
         if sub == 'all':
@@ -23,6 +13,11 @@ def show(db,args):
             items = db.grabMostRecent(1,2)
         elif sub[0:5] == 'last~' and len(sub) == 6:
             items = db.grabMostRecent(1,int(sub[5]))
+        elif sub[0:4] == 'last' and len(sub) == 5:
+            items = db.grabMostRecent(int(sub[4]))
+        elif db.isTag(sub):
+            print 'yuppers'
+            items = db.grabAllWithTag(sub)
         else:
             items = [db.grabItem(sub)]
     else:

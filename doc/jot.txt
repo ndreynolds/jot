@@ -31,7 +31,7 @@ the path flag to direct it to the appropriate path.
 Commands
 ======================================================================================
 
-Keywords
+Reference Keywords
 --------------------------------------------------------------------------------------
 Like commit references in Git, you can reference notes in Jot. Besides using the 
 note's unique identifier, you can use a number of keywords that represent one or more
@@ -53,29 +53,27 @@ singular references.
 
 --------------------------------------------------------------------------------------
 
-
 add                       When called without arguments, the add command opens a
                           shell editor. The editor Jot will open is specified by the
                           system's $EDITOR variable. If not set, Jot will default
-                          to vi. Jot will create a temporary file in the system's
+                          to vi. It will then create a temporary file in the system's
                           tmp directory. When you finish editing, you only need to 
                           save the file. Jot will capture its content. 
 
-    -m [string]           Add the note using the given string. Strings with spaces 
-    --manual [string]     need to be wrapped in quotation marks.
+    -m [string]           Add the note using the given string, skipping the editor.
+    --manual [string]     Strings with spaces meed to be wrapped in quotation marks.
 
     -t [string]           Associate the note with a tag formed from the given
     --tag [string]        string. Multiple tags can be assigned by providing-comma
                           seperated-values. As with above, if the string contains
                           spaces, it needs to be quoted.
 
-edit [identifier]         Follows similar procedure as the add command, first 
-                          writing the current note to the tmp file for editing. The 
-                          edit command does not currently take any arguments.
+edit [reference]          Open the specified note for editing. Requires a singular
+                          note reference.
 
-show [identifier/tag]     The show command is the primary method for viewing Jot's
+show [reference/tag]      The show command is the primary method for viewing Jot's
                           notes. When called with no arguments, it will display the 5
-                          most recent notes. You can optionally give it an identifier
+                          most recent notes. You can optionally give it a reference
                           or a tag as an argument. The show command will evaluate the 
                           argument you give it in the following order:
                             
@@ -84,25 +82,26 @@ show [identifier/tag]     The show command is the primary method for viewing Jot
                                 3. Is it a unique identifier?
 
                           This means that if your tag is also a keyword, it will
-                          evaluate it as such. The same applies to unique identifier's,
+                          evaluate it as such. The same applies to unique identifiers,
                           although collisions are far less likely. 
 
-remove [identifier]       This command will remove a note from Jot's database. Although
-                          permanent, it may be possible to manually recover the note 
-                          from the log or a peer that you have pushed to or pulled from. 
-                          The remove command will accept any of the keywords shown above.
-                          Use with caution, as it is possible to wipe everything with
+remove [reference]        This command will remove a note from Jot's database. 
+                          Although permanent, it may be possible to manually recover 
+                          the note from the log or a peer that you have pushed to or 
+                          pulled from. The remove command will accept any of the 
+                          keywords shown above. Use with caution, as it is possible 
+                          to wipe all notes with:
+
                                 $ jot remove all
 
-
-tag [identifier] [tag]    Manually associates a single note with one or more tags. 
-                          Provide a singular identifier and a string with one or more
+tag [reference] [tag]     Manually associates a single note with one or more tags. 
+                          Provide a singular reference and a string with one or more
                           comma separated values, which represent tags. As above, quote
                           the string if it contains spaces.
                           
                           If you need to remove a tag, you can use the following syntax:
 
-                                $ tag remove [identifier] [tag]
+                                $ tag remove [reference] [tag]
                           
 
 search [query]            Search all notes for content fields that contain the query

@@ -5,8 +5,7 @@
 # Editor:
 #
 # The text editor used to add and edit jot items. If this setting is not configured,
-# jot will attempt to find the system's default editor, falling back to (in order)
-# nano, pico, or vi,
+# jot will check the system $EDITOR variable, if not set, jot will fall back to vi.
 #
 # 'editor' => This field takes the command needed to execute the editor from the shell
 
@@ -19,13 +18,13 @@ editor:  # nano
 # are referenced explicitly. To use references like 'all' you'll need to add them to
 # the configuration.
 #
-# jot uses SCP (which in turn uses SSH) to copy log files between the local machine and
-# the peer. All the standard SSH rules apply. If SSH does not have a publickey to the peer
+# Jot uses SCP (which in turn uses SSH) to copy log files between the local machine and
+# the peer. All the standard SSH rules apply. If SSH does not have a key to the peer
 # machine AND the key parameter is not configured, you will be prompted for a password on
 # any push, pull, or clone.
 #
 # 'peer' => This field takes a hostname or IP address, optionally prefixed by a username.
-# 'key'  => Optional field. jot will try and use the supplied keyfile to connect. 
+# 'key'  => Optional field. Jot will pass the supplied keyfile to SSH. 
 #
 
 peer:    # 192.168.2.1

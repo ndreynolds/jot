@@ -125,6 +125,33 @@ class Connection:
             else:
                 return None
 
+    def grabAllWithTag(self, tag):
+        '''Returns a list of items that have the given tag.'''
+        values = ('%' + tag + '%',)
+        query = 'select * from jot where tags like ?' 
+        if self.connected:
+            self.cursor.execute(query, values)
+            rows = self.cursor.fetchall()
+            items = []
+            if len(rows) > 0:
+                for row in rows:
+                    item = Item(db=self,identifier=row[0], content=row[1], priority=row[2], tags=row[3].split(','), timestamp=row[4])
+                    items.append(item)
+                return items
+            else:
+                return None
+
+    def isTag(self, tag):
+        '''Returns true if the given tag is present in the database.'''
+        values = ('%' + tag + '%',)
+        query = 'select * from jot where tags like ?' 
+        if self.connected:
+            self.cursor.execute(query, values)
+            rows = self.cursor.fetchall()
+            if len(rows) > 0:
+                return True
+        return False
+
     def matchIdentifier(self,identifier,quiet=False):
         '''Since entering partial identifier hashes is allowed, we need a way to match them'''
         values = (identifier + '%',)

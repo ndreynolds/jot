@@ -56,7 +56,7 @@ class Item:
         os.system(syscall)
         if os.path.exists(path):
             fp = open(path,'r')
-            self.content = ''.join([line for line in fp])
+            self.content = unicode(''.join([line for line in fp]))
             fp.close()
             return True
         else:
