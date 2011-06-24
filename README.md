@@ -30,7 +30,7 @@ Getting Started
 ----------------------------------------------------------------------------------
 
 The command structure of Jot is very similar to Git's. You won't be managing any
-repositories, but the much of it is the same.
+repositories, but much of it is the same.
 
 
 To add a new note:
