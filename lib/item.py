@@ -1,4 +1,4 @@
-import hashlib, os, tempfile, time
+import hashlib, os, tempfile, time, sys
 from bin import util 
 from datetime import datetime 
 
@@ -112,9 +112,18 @@ class Item:
                 content += '\n          '
             else:
                 content += ch
-        print 'Hash:    ', util.decorate('WARNING',self.identifier)
-        print 'Time:    ', util.decorate('WARNING',prettyTime)
-        print 'Priority:', util.decorate('WARNING',self.priority)
-        print 'Tags:    ', util.decorate('OKGREEN',','.join(self.tags))
-        print 'Content: ', content
-        print
+        if sys.stdout.isatty():
+            print 'Hash:    ', util.decorate('WARNING',self.identifier)
+            print 'Time:    ', util.decorate('WARNING',prettyTime)
+            print 'Priority:', util.decorate('WARNING',self.priority)
+            print 'Tags:    ', util.decorate('OKGREEN',','.join(self.tags))
+            print 'Content: ', content
+            print
+        else:
+            print 'Hash:    ', self.identifier
+            print 'Time:    ', prettyTime
+            print 'Priority:', self.priority
+            print 'Tags:    ', ','.join(self.tags)
+            print 'Content: ', content
+            print
+
