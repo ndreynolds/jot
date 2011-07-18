@@ -1,3 +1,5 @@
+from lib.pager import Pager
+
 def show(db,args):
     '''Display saved items in a variety of ways.'''
 
@@ -26,9 +28,17 @@ def show(db,args):
         print 'No items to display'
         return False
     if len(items) > 0:
+        page = False
+        wc = sum([len(item.content) for item in items if item is not None]) 
+        if wc > 1000:
+            page = True
+            pager = Pager()
+            pager.begin()
         for item in items:
             if item is not None:
                 item.display()
+        if page:
+            pager.end()
         return True
     print 'No items to display'
     return False
